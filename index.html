@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PAC-MAN Retro</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background-color: black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    #game-container {
+      position: relative;
+      width: 400px;
+      height: 400px;
+      background-color: black;
+      border: 2px solid yellow;
+    }
+    #pacman {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background-color: yellow;
+      border-radius: 50%;
+      top: 190px;
+      left: 190px;
+    }
+    .dot {
+      position: absolute;
+      width: 5px;
+      height: 5px;
+      background-color: white;
+      border-radius: 50%;
+    }
+    #score {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      color: white;
+      font-family: Arial, sans-serif;
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+    <div id="pacman"></div>
+    <div id="score">Puntuación: 0</div>
+  </div>
+
+  <script>
+    const gameContainer = document.getElementById("game-container");
+    const pacman = document.getElementById("pacman");
+    const scoreElement = document.getElementById("score");
+    let score = 0;
+    let dots = [];
+
+    // Crear puntos (dots)
+    function createDots() {
+      for (let i = 0; i < 20; i++) {
+        for (let j = 0; j < 20; j++) {
+          const dot = document.createElement("div");
+          dot.classList.add("dot");
+          dot.style.top = `${i * 20}px`;
+          dot.style.left = `${j * 20}px`;
+          gameContainer.appendChild(dot);
+          dots.push(dot);
+        }
+      }
+    }
+
+    // Mover PAC-MAN
+    function movePacman(event) {
+      const key = event.key;
+      const pacmanTop = parseInt(pacman.style.top);
+      const pacmanLeft = parseInt(pacman.style.left);
+
+      if (key === "ArrowUp" && pacmanTop > 0) {
+        pacman.style.top = `${pacmanTop - 5}px`;
+      } else if (key === "ArrowDown" && pacmanTop < 380) {
+        pacman.style.top = `${pacmanTop + 5}px`;
+      } else if (key === "ArrowLeft" && pacmanLeft > 0) {
+        pacman.style.left = `${pacmanLeft - 5}px`;
+      } else if (key === "ArrowRight" && pacmanLeft < 380) {
+        pacman.style.left = `${pacmanLeft + 5}px`;
+      }
+
+      checkCollision();
+    }
+
+    // Verificar colisiones con los puntos
+    function checkCollision() {
+      dots.forEach((dot, index) => {
+        const dotRect = dot.getBoundingClientRect();
+        const pacmanRect = pacman.getBoundingClientRect();
+
+        if (
+          pacmanRect.left < dotRect.right &&
+          pacmanRect.right > dotRect.left &&
+          pacmanRect.top < dotRect.bottom &&
+          pacmanRect.bottom > dotRect.top
+        ) {
+          dot.remove();
+          dots.splice(index, 1);
+          score += 10;
+          scoreElement.textContent = `Puntuación: ${score}`;
+        }
+      });
+    }
+
+    // Inicializar el juego
+    function initGame() {
+      createDots();
+      document.addEventListener("keydown", movePacman);
+    }
+
+    initGame();
+  </script>
+</body>
+</html>
